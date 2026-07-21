@@ -5,7 +5,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <meta name="theme-color" content="#ff0000">
   <title>Gebäudeautomation | Sparkasse Bovenden</title>
-  <link rel="stylesheet" href="styles.css">
+  <link rel="stylesheet" href="styles.css?v=20260722-7">
 </head>
 <body>
   <svg class="icon-sprite" aria-hidden="true">
@@ -20,24 +20,29 @@
     <symbol id="i-check" viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="m8 12 2.5 2.5L16 9"/></symbol>
     <symbol id="i-thermo" viewBox="0 0 24 24"><path d="M14 14.8V5a4 4 0 0 0-8 0v9.8a6 6 0 1 0 8 0z"/><path d="M10 7v10"/></symbol>
     <symbol id="i-light" viewBox="0 0 24 24"><path d="M9 18h6M10 22h4M8.5 15.5A7 7 0 1 1 15.5 15.5L14 18h-4z"/></symbol>
+    <symbol id="i-blinds" viewBox="0 0 24 24"><path d="M5 3h14M6 7h12M6 11h12M6 15h12M6 19h12M8 3v18M16 3v18"/></symbol>
+    <symbol id="i-user" viewBox="0 0 24 24"><circle cx="12" cy="8" r="4"/><path d="M4 21a8 8 0 0 1 16 0"/></symbol>
+    <symbol id="i-window" viewBox="0 0 24 24"><rect x="4" y="3" width="16" height="18"/><path d="M12 3v18M4 12h16"/></symbol>
+    <symbol id="i-calendar" viewBox="0 0 24 24"><rect x="3" y="5" width="18" height="16" rx="1"/><path d="M7 3v4M17 3v4M3 10h18"/></symbol>
     <symbol id="i-cloud" viewBox="0 0 24 24"><path d="M5 18h13a4 4 0 0 0 .4-8A7 7 0 0 0 5 9.5 4.3 4.3 0 0 0 5 18z"/></symbol>
     <symbol id="i-sun" viewBox="0 0 24 24"><circle cx="12" cy="12" r="4"/><path d="M12 2v2M12 20v2M4.9 4.9l1.4 1.4M17.7 17.7l1.4 1.4M2 12h2M20 12h2M4.9 19.1l1.4-1.4M17.7 6.3l1.4-1.4"/></symbol>
-    <symbol id="i-pump" viewBox="0 0 24 24"><circle cx="10" cy="12" r="6"/><path d="m8 9 5 3-5 3zM16 9h5v6h-5M4 12H2"/></symbol>
+    <symbol id="i-moon" viewBox="0 0 24 24"><path d="M20 15.5A8.5 8.5 0 0 1 8.5 4 8.5 8.5 0 1 0 20 15.5z"/></symbol>
+    <symbol id="i-back" viewBox="0 0 24 24"><path d="m15 18-6-6 6-6M9 12h10"/></symbol>
   </svg>
 
   <main class="app-shell">
-    <aside class="sidebar" aria-label="Anlagennavigation">
-      <div class="brand-mark">S</div>
+    <aside class="sidebar" id="sidebar" aria-label="Anlagennavigation">
+      <button class="brand-mark" id="navToggle" type="button" aria-label="Navigation öffnen" aria-expanded="false">S</button>
       <nav class="nav-primary">
-        <button class="nav-button is-active" data-screen="overview" title="Hauptseite"><svg><use href="#i-dashboard"/></svg><span>Übersicht</span></button>
+        <button class="nav-button is-active" data-screen="overview" title="Übersicht"><svg><use href="#i-dashboard"/></svg><span>Übersicht</span></button>
         <button class="nav-button" data-screen="rooms" title="Räume"><svg><use href="#i-building"/></svg><span>Räume</span></button>
         <button class="nav-button" data-screen="heating" title="Heizung"><svg><use href="#i-flame"/></svg><span>Heizung</span></button>
         <button class="nav-button" data-screen="ventilation" title="Lüftung"><svg><use href="#i-wind"/></svg><span>Lüftung</span></button>
-        <button class="nav-button inert" title="Kälte – nicht Teil des Mockups"><svg><use href="#i-snow"/></svg><span>Kälte</span></button>
+        <button class="nav-button inert" title="Kälte"><svg><use href="#i-snow"/></svg><span>Kälte</span></button>
       </nav>
       <nav class="nav-secondary" aria-label="Weitere Bereiche">
-        <button class="nav-button inert" title="Einstellungen – nicht Teil des Mockups"><svg><use href="#i-settings"/></svg><span>Setup</span></button>
-        <button class="nav-button inert" title="Information – nicht Teil des Mockups"><svg><use href="#i-info"/></svg><span>Info</span></button>
+        <button class="nav-button inert" title="Einstellungen"><svg><use href="#i-settings"/></svg><span>Setup</span></button>
+        <button class="nav-button inert" title="Information"><svg><use href="#i-info"/></svg><span>Info</span></button>
       </nav>
     </aside>
 
@@ -45,85 +50,87 @@
       <header class="topbar">
         <div class="site-title"><strong>Sparkasse Bovenden</strong><span>Gebäudeautomation · Managementebene</span></div>
         <div class="screen-title" id="screenTitle">Systemübersicht</div>
-        <div class="top-actions"><span class="connection"><i></i>BACnet/IP online</span><div class="clock"><strong id="clockTime">--:--</strong><span id="clockDate">--</span></div><div class="user-badge">FM</div></div>
+        <div class="top-actions">
+          <span class="connection"><i></i>BACnet/IP online</span>
+          <div class="clock"><strong id="clockTime">--:--</strong><span id="clockDate">--</span></div>
+          <button class="theme-toggle" id="themeToggle" type="button" aria-label="Hell- oder Dunkelmodus manuell umschalten" title="Darstellung manuell umschalten"><svg><use href="#i-sun"/></svg><i></i><svg><use href="#i-moon"/></svg></button>
+          <div class="user-badge">FM</div>
+        </div>
       </header>
 
       <section class="screen is-active" id="screen-overview" aria-labelledby="overview-title">
         <div class="page-heading"><h1 id="overview-title">Systemübersicht</h1><span class="last-update">Letzte Aktualisierung <strong>vor 12 s</strong></span></div>
         <div class="overview-layout">
           <div class="system-list">
-            <article class="system-card"><div class="system-icon rooms"><svg><use href="#i-building"/></svg></div><div class="system-copy"><span>Räume</span><strong>16 Regelzonen</strong><div class="system-details"><b id="overviewRoomTemp">Ø 19,7 °C</b><b id="overviewOccupancy">3 belegt</b><b id="overviewRoomMode">COMFORT</b></div></div><div class="system-kpis"><span>0 Fehlermeldungen</span><strong class="normal"><svg><use href="#i-check"/></svg>Betrieb normal</strong></div></article>
-            <article class="system-card"><div class="system-icon heat"><svg><use href="#i-flame"/></svg></div><div class="system-copy"><span>Heizung</span><strong>WOLF Hybridanlage</strong><div class="system-details"><b id="overviewDemand">12,8 kW Bedarf</b><b id="overviewWpPower">WP 63 %</b><b id="overviewBuffer">Puffer 68 %</b></div></div><div class="system-kpis"><span>0 Fehlermeldungen</span><strong class="normal"><svg><use href="#i-check"/></svg>Betrieb normal</strong></div></article>
-            <article class="system-card"><div class="system-icon air"><svg><use href="#i-wind"/></svg></div><div class="system-copy"><span>Lüftung</span><strong>Helios Air1 XHP 1500</strong><div class="system-details"><b id="overviewAirflow">742 m³/h</b><b id="overviewCo2">Ø 811 ppm</b><b id="overviewWrg">WRG 78 %</b></div></div><div class="system-kpis"><span>0 Fehlermeldungen</span><strong class="normal"><svg><use href="#i-check"/></svg>Betrieb normal</strong></div></article>
-            <article class="system-card"><div class="system-icon cold"><svg><use href="#i-snow"/></svg></div><div class="system-copy"><span>Kälte</span><strong>Wärmepumpe · 500-l-Puffer</strong><div class="system-details"><b>Heizbetrieb</b><b>Kühlung gesperrt</b><b>8/12 °C Soll</b></div></div><div class="system-kpis"><span>0 Fehlermeldungen</span><strong class="normal"><svg><use href="#i-check"/></svg>Betrieb normal</strong></div></article>
+            <article class="system-card"><div class="system-icon rooms"><svg><use href="#i-building"/></svg></div><div class="system-copy"><span>Räume</span><strong>17 Regelzonen</strong></div><div class="system-details"><b id="overviewRoomTemp">Ø 19,7 °C</b><b id="overviewOccupancy">3 belegt</b><b id="overviewRoomMode">COMFORT</b></div><div class="system-kpis"><span>0 Fehlermeldungen</span><strong class="normal"><svg><use href="#i-check"/></svg>Betrieb normal</strong></div></article>
+            <article class="system-card"><div class="system-icon heat"><svg><use href="#i-flame"/></svg></div><div class="system-copy"><span>Heizung</span><strong>WOLF Hybridanlage</strong></div><div class="system-details"><b id="overviewDemand">12,8 kW</b><b id="overviewWpPower">WP 63 %</b><b id="overviewBuffer">Puffer 68 %</b></div><div class="system-kpis"><span>0 Fehlermeldungen</span><strong class="normal"><svg><use href="#i-check"/></svg>Betrieb normal</strong></div></article>
+            <article class="system-card"><div class="system-icon air"><svg><use href="#i-wind"/></svg></div><div class="system-copy"><span>Lüftung</span><strong>Helios Air1 XHP 1500</strong></div><div class="system-details"><b id="overviewAirflow">742 m³/h</b><b id="overviewCo2">Ø 811 ppm</b><b id="overviewWrg">WRG 78 %</b></div><div class="system-kpis"><span>0 Fehlermeldungen</span><strong class="normal"><svg><use href="#i-check"/></svg>Betrieb normal</strong></div></article>
+            <article class="system-card disabled-system"><div class="system-icon cold"><svg><use href="#i-snow"/></svg></div><div class="system-copy"><span>Kälte</span><strong>Wärmepumpe · 500-l-Puffer</strong></div><div class="system-details"><b>Heizbetrieb</b><b>Kühlung gesperrt</b><b>Kein Bedarf</b></div><div class="system-kpis"><span>Gesperrt</span><strong class="inactive">Nicht verfügbar</strong></div></article>
           </div>
           <div class="info-column">
             <article class="info-card warning-card"><div class="card-heading"><span><svg><use href="#i-alert"/></svg>Warnungen</span><small>Heute</small></div><div class="empty-state"><svg><use href="#i-check"/></svg><strong>Keine aktiven Warnungen</strong><span>Alle Anlagen arbeiten innerhalb der Grenzwerte.</span></div></article>
-            <article class="info-card weather-card"><div class="card-heading"><span><svg><use href="#i-cloud"/></svg>Wetter Bovenden</span><small>Prognose</small></div><div class="weather-now"><div><strong>6,5°</strong><span>Bewölkt · Heizbetrieb</span></div><div><span>Außenfühler</span><strong>6,5 °C</strong></div></div><div class="forecast"><div><span>Heute</span><svg><use href="#i-cloud"/></svg><strong>8° / 2°</strong><small>bewölkt</small></div><div><span>Di</span><svg><use href="#i-sun"/></svg><strong>7° / 1°</strong><small>heiter</small></div><div><span>Mi</span><svg><use href="#i-cloud"/></svg><strong>9° / 3°</strong><small>wolkig</small></div></div></article>
+            <article class="info-card weather-card"><div class="card-heading"><span><svg><use href="#i-cloud"/></svg>Wetter aktuell</span><small>Bovenden</small></div><div class="weather-now"><strong id="weatherCurrent">-- °C</strong><strong id="weatherCondition">--</strong></div><div class="forecast-heading">Prognose</div><div class="forecast" id="forecast"></div></article>
           </div>
         </div>
         <div class="system-footer"><span><i class="dot green"></i>Automationsstation PXC7.E400M</span><span><i class="dot blue"></i>126 BACnet-Objekte aktiv</span><span><i class="dot gray"></i>Nächste Wartung in 41 Tagen</span></div>
       </section>
 
       <section class="screen" id="screen-rooms" aria-labelledby="rooms-title">
-        <div class="page-heading compact-heading"><h1 id="rooms-title">Raumübersicht</h1><div class="floor-switch" role="group" aria-label="Geschoss wählen"><button class="is-selected" data-floor="eg">Erdgeschoss</button><button data-floor="og">1. Obergeschoss</button></div></div>
-        <div class="plan-shell">
-          <div class="floor-view is-active" id="floor-eg">
-            <svg class="floor-geometry" viewBox="0 0 1000 600" aria-label="Vereinfachter Grundriss Erdgeschoss">
-              <path class="outer-wall" d="M245 143H760V470H245Z"/>
-              <path class="inner-wall" d="M310 143V270M410 143V270M510 143V270M610 143V270M710 143V470M245 270H710M340 270V470M600 270V470M340 350H600M490 350V470"/>
-              <path class="window-line" d="M322 143h75M422 143h75M522 143h75M622 143h75M245 300v110M365 470h100M515 470h65M620 470h70"/>
-              <path class="door-line" d="M327 270v-25a25 25 0 0 1 25 25M427 270v-25a25 25 0 0 1 25 25M527 270v-25a25 25 0 0 1 25 25M627 270v-25a25 25 0 0 1 25 25M415 350v24a24 24 0 0 0 24-24"/>
-              <g class="room-label"><text x="270" y="215">S110</text><text x="350" y="215">S106</text><text x="450" y="215">S107</text><text x="550" y="215">S108</text><text x="650" y="215">S109</text><text x="270" y="375">S101</text><text x="460" y="315">S102</text><text x="395" y="415">S104</text><text x="545" y="415">S105</text><text x="731" y="325">S103</text></g>
+        <div class="page-heading compact-heading"><div class="room-heading"><button class="back-button" id="roomBack" type="button" aria-label="Zurück zur Raumübersicht"><svg><use href="#i-back"/></svg></button><h1 id="rooms-title">Raumübersicht</h1></div><div class="floor-switch" id="floorSwitch" role="group" aria-label="Geschoss wählen"><button class="is-selected" data-floor="eg">Erdgeschoss</button><button data-floor="og">1. Obergeschoss</button></div></div>
+        <div class="plan-shell" id="planShell">
+          <div class="floor-view is-active" id="floor-eg"><div class="floor-stage">
+            <svg class="floor-geometry" viewBox="0 0 1120 680" role="img" aria-label="Neu gezeichneter Grundriss Erdgeschoss">
+              <path class="outer-wall" d="M220 140H900V550H220Z"/>
+              <path class="inner-wall" d="M300 140V270M380 140V270M480 140V270M580 140V270M680 140V270M780 140V355M220 270H780M220 355H380M380 270V550M780 355H900M780 355V550M500 430V550M500 430H640V550M680 440H780M680 440V550"/>
+              <g class="room-label"><text x="260" y="205">S113</text><text x="340" y="205">S111</text><text x="430" y="205">S110</text><text x="530" y="205">S106</text><text x="630" y="205">S107</text><text x="730" y="205">S108</text><text x="840" y="220">S109</text><text x="300" y="315">S112</text><text x="300" y="455">S101</text><text x="455" y="470">S102</text><text x="570" y="495">S104</text><text x="730" y="500">S103</text><text x="840" y="455">S105</text></g>
             </svg>
-            <svg class="connector-layer" viewBox="0 0 1000 600" aria-hidden="true"><defs><marker id="arrow-eg" markerWidth="6" markerHeight="6" refX="5" refY="3" orient="auto"><path d="M0,0 L6,3 L0,6z"/></marker></defs><g id="lines-eg"></g></svg>
+            <svg class="connector-layer" viewBox="0 0 1120 680" aria-hidden="true"><defs><marker id="dot-eg" markerWidth="6" markerHeight="6" refX="3" refY="3"><circle cx="3" cy="3" r="2.3"/></marker><marker id="arrow-eg" markerWidth="7" markerHeight="7" refX="6" refY="3.5" orient="auto"><path d="M0,0 L7,3.5 L0,7z"/></marker></defs><g id="lines-eg"></g></svg>
             <div class="room-layer" id="rooms-eg"></div>
-          </div>
-          <div class="floor-view" id="floor-og">
-            <svg class="floor-geometry" viewBox="0 0 1000 600" aria-label="Vereinfachter Grundriss 1. Obergeschoss">
-              <path class="outer-wall" d="M205 150H800V465H205Z"/>
-              <path class="inner-wall" d="M320 150V465M420 150V465M520 150V465M620 150V465M700 150V465M205 280H800M320 360H700"/>
-              <path class="window-line" d="M230 150h70M335 150h65M440 150h60M540 150h60M640 150h40M225 465h75M335 465h65M440 465h60M540 465h60M720 465h60"/>
-              <path class="door-line" d="M350 280v-24a24 24 0 0 1 24 24M450 280v-24a24 24 0 0 1 24 24M550 280v-24a24 24 0 0 1 24 24M650 280v-24a24 24 0 0 1 24 24"/>
-              <g class="room-label muted"><text x="250" y="220">Wohnung 3</text><text x="345" y="220">W3 202</text><text x="445" y="220">W3 203</text><text x="545" y="220">W3 204</text><text x="645" y="220">W3 205</text><text x="720" y="220">Wohnung 2</text></g>
-              <g class="room-label"><text x="255" y="410">S205</text><text x="455" y="410">S202</text><text x="655" y="410">S201</text><text x="735" y="410">S204</text></g>
+          </div></div>
+          <div class="floor-view" id="floor-og"><div class="floor-stage">
+            <svg class="floor-geometry" viewBox="0 0 1120 680" role="img" aria-label="Neu gezeichneter Grundriss 1. Obergeschoss">
+              <path class="outer-wall" d="M220 140H900V550H220Z"/>
+              <path class="inner-wall" d="M400 140V300M520 140V300M640 140V300M800 240H900M800 240V360M220 300H400M320 300V360M320 360H400M400 300H800M400 300V550M700 380H800M700 380V550M800 360H900M800 360V550"/>
+              <g class="room-label"><text x="360" y="330">S204</text><text x="305" y="440">S205</text><text x="550" y="420">S202</text><text x="750" y="460">S201</text></g>
             </svg>
-            <svg class="connector-layer" viewBox="0 0 1000 600" aria-hidden="true"><defs><marker id="arrow-og" markerWidth="6" markerHeight="6" refX="5" refY="3" orient="auto"><path d="M0,0 L6,3 L0,6z"/></marker></defs><g id="lines-og"></g></svg>
+            <svg class="connector-layer" viewBox="0 0 1120 680" aria-hidden="true"><defs><marker id="dot-og" markerWidth="6" markerHeight="6" refX="3" refY="3"><circle cx="3" cy="3" r="2.3"/></marker><marker id="arrow-og" markerWidth="7" markerHeight="7" refX="6" refY="3.5" orient="auto"><path d="M0,0 L7,3.5 L0,7z"/></marker></defs><g id="lines-og"></g></svg>
             <div class="room-layer" id="rooms-og"></div>
-          </div>
+          </div></div>
         </div>
+        <section class="room-detail" id="roomDetail" aria-label="Raumdetail"><div class="room-detail-grid" id="roomDetailGrid"></div></section>
       </section>
 
       <section class="screen" id="screen-heating" aria-labelledby="heating-title">
-        <div class="page-heading compact-heading"><h1 id="heating-title">Heizung</h1><div class="header-kpis"><span><small>Wärmebedarf</small><strong id="heatDemand">12,8 kW</strong></span><span><small>Pufferladung</small><strong id="bufferLoad">68 %</strong></span><span class="positive"><small>Betriebsniveau</small><strong id="heatingMode">COMFORT</strong></span></div></div>
+        <div class="page-heading compact-heading"><h1 id="heating-title">Heizung</h1><div class="header-kpis"><span><small>Wärmebedarf</small><strong id="heatDemand">-- kW</strong></span><span><small>Puffer oben</small><strong id="bufferTopKpi">-- °C</strong></span><span class="positive"><small>Betriebsniveau</small><strong id="heatingMode">--</strong></span></div></div>
         <div class="plant-layout">
           <div class="plant-column">
             <div class="plant-cards">
-              <article class="plant-card active"><div class="plant-title"><span><svg><use href="#i-snow"/></svg>Wärmepumpe</span><strong id="wpStatus">Grundlast · aktiv</strong></div><h2>WOLF CHA-16/20</h2><div class="value-grid"><div><span>Außentemperatur</span><strong>6,5 °C</strong></div><div><span>Leistung aktuell</span><strong id="wpPower">63 %</strong></div><div><span>Vorlauf / Rücklauf</span><strong id="flowReturn">41,6 / 34,1 °C</strong></div><div><span>GLT-Anforderung E2/SAF</span><strong id="wpRequest">5,9 V</strong></div><div><span>Arbeitszahl aktuell</span><strong>3,7</strong></div><div><span>Abtaubetrieb A1</span><strong>Aus</strong></div></div><label class="control-label">Betriebsart<select><option>Automatik</option><option>Heizen</option><option>Aus</option></select></label></article>
-              <article class="plant-card standby"><div class="plant-title"><span><svg><use href="#i-flame"/></svg>Gasbrennwertgerät</span><strong>Spitzenlast · bereit</strong></div><h2>WOLF TGB-2-40</h2><div class="value-grid"><div><span>Brennerleistung</span><strong>0 %</strong></div><div><span>Kesselsollwert</span><strong>48,0 °C</strong></div><div><span>Kesseltemperatur</span><strong>45,2 °C</strong></div><div><span>Konfiguration E2</span><strong>52 · Sollwert</strong></div><div><span>Warmwasser Wohnungen</span><strong>54,1 °C</strong></div><div><span>Brennerstarts heute</span><strong>3</strong></div></div><label class="control-label">Freigabe<select><option>Automatische Priorität</option><option>Freigegeben</option><option>Gesperrt</option></select></label></article>
+              <article class="plant-card active"><div class="plant-title"><span><svg><use href="#i-flame"/></svg>Wärmepumpe</span><strong id="wpStatus">Grundlast · aktiv</strong></div><h2>WOLF CHA-16/20</h2><div class="value-grid"><div><span>Außentemperatur</span><strong id="heatOutside">-- °C</strong></div><div><span>Heizleistung</span><strong id="wpOutput">-- kW</strong></div><div><span>Vorlauf / Rücklauf</span><strong id="flowReturn">-- / -- °C</strong></div><div><span>GLT-Anforderung E2/SAF</span><strong id="wpRequest">-- V</strong></div><div><span>Leistungsanteil</span><strong id="wpPower">-- %</strong></div><div><span>Abtaubetrieb A1</span><strong>Aus</strong></div></div><label class="control-label">Betriebsart<select><option>Automatik</option><option>Heizen</option><option>Aus</option></select></label></article>
+              <article class="plant-card standby"><div class="plant-title"><span><svg><use href="#i-flame"/></svg>Gasbrennwertgerät</span><strong id="gasStatus">Spitzenlast · bereit</strong></div><h2>WOLF TGB-2-40</h2><div class="value-grid"><div><span>Heizleistung</span><strong id="gasOutput">-- kW</strong></div><div><span>Brennerleistung</span><strong id="gasPower">-- %</strong></div><div><span>Kesselsollwert</span><strong id="boilerSetpoint">-- °C</strong></div><div><span>Kesseltemperatur</span><strong id="boilerTemp">-- °C</strong></div><div><span>Warmwasser Wohnungen</span><strong id="dhwTemp">-- °C</strong></div><div><span>Brennerstarts heute</span><strong id="burnerStarts">--</strong></div></div><label class="control-label">Freigabe<select><option>Automatische Priorität</option><option>Freigegeben</option><option>Gesperrt</option></select></label></article>
             </div>
-            <div class="hydraulic-strip">
-              <div class="asset-node source"><svg><use href="#i-snow"/></svg><span>CHA</span><strong id="schemeWpOutput">12,8 kW</strong></div><div class="flow-line hot"><i></i></div><div class="asset-node buffer"><span>500 l</span><strong>44,8 °C</strong><small>oben</small></div><div class="flow-line hot"><i></i></div><div class="asset-node pump"><svg><use href="#i-pump"/></svg><span>P2 / P3</span><strong id="pumpOutput">52 / 38 %</strong></div><div class="flow-line hot"><i></i></div><div class="asset-node rooms"><svg><use href="#i-building"/></svg><span>Heizkreise</span><strong id="schemeHeatDemand">12,8 kW</strong></div>
-              <div class="gas-branch"><span>TGB-2-40 · 0 %</span></div>
-            </div>
-            <div class="buffer-readings"><div><span>Puffer oben</span><strong>44,8 °C</strong><i style="width:74%"></i></div><div><span>Puffer Mitte</span><strong>39,6 °C</strong><i style="width:62%"></i></div><div><span>Puffer unten</span><strong>34,1 °C</strong><i style="width:49%"></i></div></div>
+            <article class="chart-card"><div class="chart-heading"><div><h2>Leistung P [kW]</h2></div><div class="chart-legend"><span><i class="line-red"></i>Wärmepumpe</span><span><i class="line-yellow"></i>Gas</span><span><i class="line-gray"></i>Wärmebedarf</span></div></div><svg class="time-chart" id="heatingChart" viewBox="0 0 900 300" role="img" aria-label="Zeitreihe der Heizleistung"></svg></article>
           </div>
-          <aside class="zone-column"><div class="section-head"><div><span>Räume / Zonen</span><strong>Bedarfsmeldungen</strong></div><span class="zone-summary" id="heatingZoneSummary">5 von 7 aktiv</span></div><div class="zone-list" id="heatingZones"></div></aside>
+          <aside class="zone-column"><div class="section-head"><div><span>Räume</span><strong>Heizbedarf</strong></div><span class="zone-summary" id="heatingZoneSummary">-- kW</span></div><div class="zone-list" id="heatingZones"></div></aside>
         </div>
       </section>
 
       <section class="screen" id="screen-ventilation" aria-labelledby="ventilation-title">
-        <div class="page-heading compact-heading"><h1 id="ventilation-title">Lüftung</h1><div class="header-kpis"><span><small>Zuluft aktuell</small><strong id="airflowKpi">742 m³/h</strong></span><span><small>WRG</small><strong id="wrgKpi">78 %</strong></span><span class="positive"><small>Betriebsniveau</small><strong id="ventilationMode">COMFORT</strong></span></div></div>
-        <div class="plant-layout ventilation-layout">
+        <div class="page-heading compact-heading"><h1 id="ventilation-title">Lüftung</h1><div class="header-kpis"><span><small>Zuluft aktuell</small><strong id="airflowKpi">-- m³/h</strong></span><span><small>WRG</small><strong id="wrgKpi">-- %</strong></span><span class="positive"><small>Betriebsniveau</small><strong id="ventilationMode">--</strong></span></div></div>
+        <div class="plant-layout">
           <div class="plant-column">
-            <article class="air-unit-card"><div class="unit-header"><div><span class="unit-icon"><svg><use href="#i-wind"/></svg></span><div><small>Lüftungsgerät Erdgeschoss</small><h2>Helios Air1 XHP 1500</h2></div></div><span class="run-badge" id="airUnitStatus">Betrieb · Auto</span></div><div class="air-flow-diagram"><div class="air-path outside"><span>Außenluft</span><strong>6,5 °C</strong></div><div class="duct blue"><i></i></div><div class="fan"><svg><use href="#i-wind"/></svg><span>Zuluft</span><strong id="fanPower">68 %</strong></div><div class="duct blue"><i></i></div><div class="exchange"><span>WRG</span><strong id="wrgValue">78 %</strong><small>Bypass 0 %</small></div><div class="duct red"><i></i></div><div class="air-path rooms"><span>Zuluft Räume</span><strong id="supplyTemp">19,2 °C</strong></div></div><div class="unit-values"><div><span>Volumenstrom Soll / Ist</span><strong id="airflowValues">760 / 742 m³/h</strong></div><div><span>Kanaldruck Zuluft</span><strong id="ductPressure">186 Pa</strong></div><div><span>Ablufttemperatur</span><strong id="extractTemp">19,8 °C</strong></div><div><span>CO₂-Führungswert</span><strong id="co2Lead">1.180 ppm</strong></div><div><span>Heizregister</span><strong id="heatingCoil">18 %</strong></div><div><span>Kühlregister</span><strong>0 %</strong></div></div><div class="unit-controls"><label>Regelstrategie<select><option>Bedarf / CO₂</option><option>Konstanter Volumenstrom</option><option>Konstanter Druck</option></select></label><label>Stufe<select><option>Auto</option><option>Minimal</option><option>Normal</option><option>Intensiv</option></select></label></div></article>
-            <article class="secondary-unit"><div><span class="unit-icon small"><svg><use href="#i-wind"/></svg></span><div><strong>KWL Untergeschoss</strong><small>Vallox · Sanitär- und Nebenräume</small></div></div><div class="secondary-values"><span id="kwlStatus">Normalbetrieb</span><strong id="kwlFlow">214 m³/h</strong><span>CO₂ / Feuchte</span><strong id="kwlAirQuality">780 ppm / 48 %</strong></div></article>
+            <article class="air-unit-card">
+              <div class="unit-header"><div><div><small>Lüftungsgerät Erdgeschoss</small><h2>Helios Air1 XHP 1500</h2></div></div><span class="run-badge" id="airUnitStatus">ECONOMY · Aus</span></div>
+              <div class="air-flow-diagram"><div class="air-path outside"><span>Außenluft</span><strong id="airOutside">-- °C</strong></div><div class="duct outdoor" aria-label="Außenluft"><i></i></div><div class="fan"><svg><use href="#i-wind"/></svg><span>Zuluft</span><strong id="fanPower">-- %</strong></div><div class="duct outdoor" aria-label="Außenluft vor Behandlung"><i></i></div><div class="exchange"><span>WRG</span><strong id="wrgValue">-- %</strong><small>Bypass 0 %</small></div><div class="duct supply" aria-label="Behandelte Zuluft"><i></i></div><div class="air-path rooms"><span>Zuluft Räume</span><strong id="supplyTemp">-- °C</strong></div></div>
+              <div class="unit-values"><span>Volumenstrom Soll / Ist<strong id="airflowValues">-- / -- m³/h</strong></span><span>Kanaldruck Zuluft<strong id="ductPressure">-- Pa</strong></span><span>Ablufttemperatur<strong id="extractTemp">-- °C</strong></span><span>CO₂-Führungswert<strong id="co2Lead">-- ppm</strong></span><span>Heizregister<strong id="heatingCoil">-- %</strong></span><span>Kühlregister<strong>0 %</strong></span></div>
+              <div class="unit-controls"><label>Regelstrategie<select><option>Bedarf / CO₂</option><option>Konstant</option></select></label><label>Stufe<select><option>Auto</option><option>Aus</option><option>Intensiv</option></select></label></div>
+            </article>
+            <article class="chart-card ventilation-chart-card"><div class="chart-heading"><div><h2>Volumenstrom [m³/h] und Außenlufttemperatur [°C]</h2></div><div class="chart-legend"><span><i class="line-blue"></i>Zuluft</span><span><i class="line-orange"></i>Außentemperatur</span></div></div><svg class="time-chart" id="ventilationChart" viewBox="0 0 900 300" role="img" aria-label="Zeitreihe von Volumenstrom und Außentemperatur"></svg></article>
           </div>
-          <aside class="zone-column"><div class="section-head"><div><span>Versorgte Räume</span><strong>Zuluftanforderung</strong></div><span class="zone-summary" id="averageCo2">Ø 811 ppm</span></div><div class="zone-list" id="airZones"></div></aside>
+          <aside class="zone-column"><div class="section-head"><div><span>Räume</span><strong>Zuluftanforderung</strong></div><span class="zone-summary" id="averageCo2">Ø -- ppm</span></div><div class="zone-list" id="airZones"></div></aside>
         </div>
       </section>
     </section>
   </main>
-  <script src="app.js"></script>
+  <script src="app.js?v=20260722-7"></script>
 </body>
 </html>
