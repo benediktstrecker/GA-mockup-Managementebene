@@ -283,7 +283,7 @@ function openRoomDetail(roomId) {
   document.querySelector('#roomBack').classList.add('is-visible');
   setText('#rooms-title', `${room.name} · ${room.id}`);
   setText('#screenTitle', `${room.name} · ${room.id}`);
-  const blindValue = document.body.classList.contains('night-mode') ? 100 : 45;
+  const blindValue = 0;
   const airQuality = room.co2 <= 800 ? 'Sehr gut' : room.co2 <= 1000 ? 'Gut' : 'Erhöht';
   document.querySelector('#roomDetailGrid').innerHTML = `
     <article class="tile temperature-tile">

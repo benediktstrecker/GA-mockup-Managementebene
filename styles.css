@@ -175,10 +175,10 @@ svg { width: 21px; height: 21px; fill: none; stroke: currentColor; stroke-width:
 .state-label { padding: 5px 8px; border-radius: 4px; color: var(--red); background: #fff0f0; font-size: 11px; text-transform: uppercase; }
 .state-label.neutral { color: var(--blue); background: #eef2ff; }
 .temperature-body { flex: 1; min-height: 0; display: grid; place-items: center; gap: 10px; padding: 10px 0 7px; }
-.actual-temp { position: relative; width: 185px; height: 185px; border: 10px solid var(--red); border-right-color: #e9e9e9; border-radius: 50%; display: grid; place-content: center; text-align: center; }
-.actual-temp strong { font-size: 52px; line-height: 1; }
-.actual-temp > span { position: absolute; right: 34px; top: 55px; color: var(--muted); font-size: 16px; }
-.actual-temp small { margin-top: 6px; color: var(--muted); }
+.actual-temp { position: relative; width: 185px; height: 185px; border: 10px solid var(--red); border-right-color: #e9e9e9; border-radius: 50%; display: grid; grid-template-columns: auto auto; grid-template-rows: auto auto; align-content: center; justify-content: center; column-gap: 4px; text-align: center; }
+.actual-temp strong { grid-column: 1; grid-row: 1; font-size: 52px; line-height: 1; }
+.actual-temp > span { grid-column: 2; grid-row: 1; align-self: end; margin-bottom: 5px; color: var(--muted); font-size: 16px; line-height: 1; }
+.actual-temp small { grid-column: 1 / -1; grid-row: 2; margin-top: 6px; color: var(--muted); }
 .setpoint-control { position: relative; width: 100%; display: grid; gap: 6px; text-align: center; }
 .setpoint-control > span, .setpoint-control small { color: var(--muted); font-size: 11px; }
 .setpoint-control > span { font-size: 13px; }
