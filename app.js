@@ -60,6 +60,8 @@ const floorData = {
 };
 
 const allRooms = Object.values(floorData).flat();
+const nonBookableRoomIds = new Set(['S101', 'S102', 'S103', 'S110', 'S111', 'S112', 'S113', 'S201', 'S204']);
+const noPresenceRoomIds = new Set(['S110', 'S111', 'S113', 'S204']);
 const clamp = (value, min, max) => Math.min(max, Math.max(min, value));
 const formatDecimal = (value) => value.toFixed(1).replace('.', ',');
 
@@ -111,10 +113,12 @@ function roomAt(room, date, outside, stateName) {
   const state = stateConfig[stateName];
   const day = mondayIndex(date);
   const hour = date.getHours() + date.getMinutes() / 60;
-  const slots = slotsForRoom(room, date);
+  const bookable = !nonBookableRoomIds.has(room.id);
+  const presenceTracked = !noPresenceRoomIds.has(room.id);
+  const slots = bookable ? slotsForRoom(room, date) : [];
   const booked = isInSlot(slots, hour);
   const openUse = day < 5 && hour >= 9 && hour < 16 && (room.type === 'common' || room.type === 'service');
-  const occupied = booked || openUse;
+  const occupied = presenceTracked && (booked || openUse);
   const target = state.target;
   const lag = stateName === 'COMFORT' ? .28 : stateName === 'PRECOMFORT' ? .45 : .38;
   const coldPenalty = Math.max(0, 4 - outside) * .025;
@@ -131,9 +135,11 @@ function roomAt(room, date, outside, stateName) {
     ...room,
     target,
     actual,
+    bookable,
+    presenceTracked,
     booked,
     occupied,
-    booking: booked ? 'Gebucht' : 'Frei',
+    booking: bookable ? (booked ? 'Gebucht' : 'Frei') : '',
     co2,
     lightsOn,
     lightLevel,
@@ -237,10 +243,27 @@ function edgePoint(anchor, card, width = 132, height = 86) {
   return [card[0] + dx * scale, card[1] + dy * scale];
 }
 
+const useOffsetConnectorStarts = true; // false restores the original label-centered starts.
+
+function connectorStart(room) {
+  if (!useOffsetConnectorStarts) return room.anchor;
+
+  const dx = room.card[0] - room.anchor[0];
+  const dy = room.card[1] - room.anchor[1];
+  if (Math.abs(dx) >= Math.abs(dy)) {
+    return [room.anchor[0] + Math.sign(dx) * 34, room.anchor[1]];
+  }
+  return [room.anchor[0], room.anchor[1] + Math.sign(dy) * 26];
+}
+
 function co2Class(value) {
   if (value <= 1000) return 'good';
   if (value <= 2000) return 'medium';
   return 'bad';
+}
+
+function statusRow(icon, label, value) {
+  return `<div><svg><use href="#${icon}"/></svg><span>${label}</span><strong>${value}</strong></div>`;
 }
 
 function renderFloorPlans(model) {
@@ -252,21 +275,26 @@ function renderFloorPlans(model) {
     roomDefs.forEach((definition) => {
       const room = model.rooms.find((entry) => entry.id === definition.id);
       const card = document.createElement('button');
+      const bookingState = room.bookable
+        ? `<span class="booking-state ${room.booked ? 'booked' : 'free'}">${room.booking}</span>`
+        : '';
       card.type = 'button';
-      card.className = `room-callout ${room.booked ? 'booked' : ''}`;
+      card.className = `room-callout${room.booked ? ' booked' : ''}${room.bookable ? '' : ' no-booking'}`;
       card.style.left = `${room.card[0] / 11.2}%`;
       card.style.top = `${room.card[1] / 6.8}%`;
       card.setAttribute('aria-label', `${room.name}, Raum ${room.id}, Details öffnen`);
-      card.innerHTML = `<h3>${room.name} · ${room.id}</h3><div class="room-values"><span>Temperatur</span><strong>${formatDecimal(room.actual)} °C</strong><span>Licht</span><strong class="light-state"><svg><use href="#i-light"/></svg>${room.lightsOn ? 'An' : 'Aus'}</strong><span>CO₂</span><strong class="co2-badge ${co2Class(room.co2)}">${room.co2} ppm</strong><span class="booking-state ${room.booked ? 'booked' : 'free'}">${room.booking}</span></div>`;
+      card.innerHTML = `<h3>${room.name} · ${room.id}</h3><div class="room-values"><span>Temperatur</span><strong>${formatDecimal(room.actual)} °C</strong><span>Licht</span><strong class="light-state"><svg><use href="#i-light"/></svg>${room.lightsOn ? 'An' : 'Aus'}</strong><span>CO₂</span><strong class="co2-badge ${co2Class(room.co2)}">${room.co2} ppm</strong>${bookingState}</div>`;
       card.addEventListener('click', () => openRoomDetail(room.id));
       roomLayer.appendChild(card);
 
-      const [edgeX, edgeY] = edgePoint(room.anchor, room.card);
+      const start = connectorStart(room);
+      const [edgeX, edgeY] = edgePoint(start, room.card);
       const line = document.createElementNS('http://www.w3.org/2000/svg', 'line');
-      line.setAttribute('x1', room.anchor[0]);
-      line.setAttribute('y1', room.anchor[1]);
+      line.setAttribute('x1', start[0]);
+      line.setAttribute('y1', start[1]);
       line.setAttribute('x2', edgeX.toFixed(1));
       line.setAttribute('y2', edgeY.toFixed(1));
+      line.setAttribute('data-room-id', room.id);
       lineLayer.appendChild(line);
     });
   });
@@ -285,6 +313,12 @@ function openRoomDetail(roomId) {
   setText('#screenTitle', `${room.name} · ${room.id}`);
   const blindValue = 0;
   const airQuality = room.co2 <= 800 ? 'Sehr gut' : room.co2 <= 1000 ? 'Gut' : 'Erhöht';
+  const statusItems = [
+    room.presenceTracked ? statusRow('i-user', 'Präsenz', room.occupied ? 'Erkannt' : 'Keine') : '',
+    statusRow('i-window', 'Fenster', 'Geschlossen'),
+    room.bookable ? statusRow('i-calendar', 'Buchung', room.booking) : '',
+    statusRow('i-thermo', 'Betriebsniveau', model.stateName)
+  ].join('');
   document.querySelector('#roomDetailGrid').innerHTML = `
     <article class="tile temperature-tile">
       <div class="tile-head"><span><svg><use href="#i-thermo"/></svg> Raumtemperatur</span><span class="state-label">Heizen aktiv</span></div>
@@ -302,7 +336,7 @@ function openRoomDetail(roomId) {
       <div class="tile-head"><span><svg><use href="#i-light"/></svg> Beleuchtung</span><label class="switch"><input id="detailLightToggle" type="checkbox" ${room.lightsOn ? 'checked' : ''}><span></span></label></div>
       <div class="control-value"><strong id="detailLightValue">${room.lightsOn ? `${room.lightLevel} %` : 'Aus'}</strong><span>Arbeitslicht</span></div>
       <input id="detailLightSlider" class="range" type="range" min="0" max="100" value="${room.lightLevel}" aria-label="Helligkeit">
-      <div class="control-footer"><span>Automatik</span><strong>Präsenz + 500 lx</strong></div>
+      <div class="control-footer"><span>Automatik</span><strong>${room.presenceTracked ? 'Präsenz + 500 lx' : 'Zeitprogramm + 500 lx'}</strong></div>
     </article>
     <article class="tile control-tile">
       <div class="tile-head"><span><svg><use href="#i-blinds"/></svg> Verschattung</span><span class="state-label neutral">Automatik</span></div>
@@ -312,7 +346,7 @@ function openRoomDetail(roomId) {
     </article>
     <article class="tile status-tile">
       <div class="tile-head"><span>Raumstatus</span><span class="status-dot"></span></div>
-      <div class="status-list"><div><svg><use href="#i-user"/></svg><span>Präsenz</span><strong>${room.occupied ? 'Erkannt' : 'Keine'}</strong></div><div><svg><use href="#i-window"/></svg><span>Fenster</span><strong>Geschlossen</strong></div><div><svg><use href="#i-calendar"/></svg><span>Buchung</span><strong>${room.booking}</strong></div><div><svg><use href="#i-thermo"/></svg><span>Betriebsniveau</span><strong>${model.stateName}</strong></div></div>
+      <div class="status-list">${statusItems}</div>
     </article>`;
 
   let detailSetpoint = room.target;
@@ -368,9 +402,13 @@ function renderAirZones(model) {
   target.replaceChildren();
   roomsByNumber(model.rooms).forEach((room) => {
     const share = model.totalAirflow ? Math.round(room.airflow / model.totalAirflow * 100) : 0;
+    const roomState = [
+      room.bookable ? room.booking : '',
+      room.presenceTracked ? (room.occupied ? 'Präsenz' : 'keine Präsenz') : ''
+    ].filter(Boolean).join(' · ');
     const row = document.createElement('div');
     row.className = 'zone-row air-row';
-    row.innerHTML = `<div><strong>${room.id} · ${room.name}</strong><span>${room.booking} · ${room.occupied ? 'Präsenz' : 'keine Präsenz'}</span></div><strong>${room.co2} ppm</strong><span>${room.airflow} m³/h</span><strong>${share} %</strong><div class="need-bar"><i style="width:${share}%"></i></div>`;
+    row.innerHTML = `<div><strong>${room.id} · ${room.name}</strong>${roomState ? `<span>${roomState}</span>` : ''}</div><strong>${room.co2} ppm</strong><span>${room.airflow} m³/h</span><strong>${share} %</strong><div class="need-bar"><i style="width:${share}%"></i></div>`;
     target.appendChild(row);
   });
   setText('#averageCo2', `Ø ${model.avgCo2} ppm`);
